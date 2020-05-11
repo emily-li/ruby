@@ -6,7 +6,7 @@ public class EnemyController : MonoBehaviour {
     
 	private Rigidbody2D rigidbody2d;
 
-	private float speed = 5f;
+	private float speed = 7.5f;
 	private float changeDirectionTimeout = 3f;
 	private float directionTimer;
 	private int direction = 1;
@@ -22,6 +22,14 @@ public class EnemyController : MonoBehaviour {
     	fixDirection();
     	changePosition();
     }
+
+    void OnCollisionEnter2D(Collision2D other) {
+	    RubyController player = other.gameObject.GetComponent<RubyController>();
+
+	    if (player != null) {
+	        player.ChangeHealth(-1);
+	    }
+	}
 
     private void fixDirection() {
         directionTimer -= Time.deltaTime;        
