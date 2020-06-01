@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,8 +16,13 @@ public class RubyController : MonoBehaviour {
     
     private float speed = 10f;
 
+    private Animator animator;
+    private Vector2 lookDirection = new Vector2();
+
     void Start()    {
         rigidbody2d = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+
         currentHealth = maxHealth;
     }
 
@@ -37,18 +42,22 @@ public class RubyController : MonoBehaviour {
             if (isInvincible) {
                 healthImpact = 0;
             } else {
+                animator.SetTrigger("Hit");
                 isInvincible = true;
                 invincibleTimer = timeInvincible;
             }
         }
 
         currentHealth = Mathf.Clamp(currentHealth + healthImpact, 0, maxHealth);
+        
         Debug.Log(currentHealth + "/" + maxHealth);    
     }
 
     private void move() {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
+        
+        setAnimatorProperties(horizontal, vertical);
         
         Vector2 position = rigidbody2d.position;
         if (horizontal > 0 || horizontal < 0) {
@@ -57,5 +66,16 @@ public class RubyController : MonoBehaviour {
             position.y = position.y + speed * (vertical * Time.deltaTime);    
         }
         rigidbody2d.MovePosition(position);
+    }
+
+    private void setAnimatorProperties(float horizontal, float vertical) {
+        Vector2 movement = new Vector2(horizontal, vertical);
+        if(!Mathf.Approximately(movement.x, 0.0f) || !Mathf.Approximately(movement.y, 0.0f)) {
+            lookDirection = movement;
+            lookDirection.Normalize();
+        }
+        animator.SetFloat("Look X", lookDirection.x);
+        animator.SetFloat("Look Y", lookDirection.y);
+        animator.SetFloat("Speed", movement.magnitude);
     }
 }
